@@ -6,6 +6,9 @@ from time import sleep
 from threading import Thread
 from os import _exit, system, remove
 
+# linux users change cls to clear 
+
+
 system('cls & mode 120,20 & title Tsunami Nuker - Loading')
 token = input('\x1b[37;5;56m[\x1b[34;5;56mTOKEN\x1b[37;5;56m]:  \x1b[0m')
 if not token:
