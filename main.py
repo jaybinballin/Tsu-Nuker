@@ -291,9 +291,11 @@ class Tsunami:
         while True:
             payload = {
                 'name': name,
-                'type': 2
+                'color': 0xFF0000,
+                hoist: True,
+                mentionable: True
             }
-            r = requests.post(f'https://canary.discordapp.com/api/v9/guilds/{guild}/roles', headers=headers, json=payload)
+            r = requests.post(f'https://canary.discordapp.com/api/v10/guilds/{guild}/roles', headers=headers, json=payload)
             if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
@@ -302,7 +304,7 @@ class Tsunami:
                 print(f'{self.white}[{self.blue}RETRYING IN {retry} SECONDS{self.white}]{self.reset}')
                 break
             else:
-                print(f'{self.white}[{self.red}FAILED TO CREATE {name}{self.white}]{self.reset}')                      
+                print(f'{self.white}[{self.red}FAILED TO CREATE {name}{self.white}]{self.reset}')                       
 
     async def scrape(self):  
         guild = input(f'{self.white}[{self.blue}GUILD ID{self.white}]: {self.reset}')
